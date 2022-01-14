@@ -13,12 +13,12 @@ import {
 } from "vscode-languageserver-protocol";
 import * as utils from "./utils";
 import * as c from "./constants";
+import { getTextRangeChanges } from "./diff";
 import * as chokidar from "chokidar";
 import { assert } from "console";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath } from "url";
 import { ChildProcess } from "child_process";
 import { WorkspaceEdit } from "vscode-languageserver";
-import { TextEdit } from "vscode-languageserver-types";
 
 // https://microsoft.github.io/language-server-protocol/specification#initialize
 // According to the spec, there could be requests before the 'initialize' request. Link in comment tells how to handle them.
@@ -438,20 +438,10 @@ function format(msg: p.RequestMessage): Array<m.Message> {
         extension === c.resiExt
       );
       if (formattedResult.kind === "success") {
-        let max = code.length;
-        let result: p.TextEdit[] = [
-          {
-            range: {
-              start: { line: 0, character: 0 },
-              end: { line: max, character: max },
-            },
-            newText: formattedResult.result,
-          },
-        ];
         let response: m.ResponseMessage = {
           jsonrpc: c.jsonrpcVersion,
           id: msg.id,
-          result: result,
+          result: getTextRangeChanges(code, formattedResult.result),
         };
         return [response];
       } else {
