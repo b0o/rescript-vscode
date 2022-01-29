@@ -10,6 +10,7 @@ API examples:
   ./rescript-editor-analysis.exe hover src/MyFile.res 10 2
   ./rescript-editor-analysis.exe references src/MyFile.res 10 2
   ./rescript-editor-analysis.exe rename src/MyFile.res 10 2 foo
+  ./rescript-editor-analysis.exe getTextEdits OldFile.res NewFile.res
 
 Dev-time examples:
   ./rescript-editor-analysis.exe dump src/MyFile.res src/MyFile2.res
@@ -55,6 +56,11 @@ Options:
   test: run tests specified by special comments in file src/MyFile.res
 
     ./rescript-editor-analysis.exe test src/src/MyFile.res
+
+  getTextEdits: get the difference between OldFile.res and NewFile.res as an
+    array of TextEdits, for use with formatting.
+
+    ./rescript-editor-analysis.exe getTextEdits OldFile.res NewFile.res
 |}
 
 let main () =
@@ -79,10 +85,12 @@ let main () =
     Commands.rename ~path ~line:(int_of_string line) ~col:(int_of_string col)
       ~newName
   | [_; "test"; path] -> Commands.test ~path
+  | [_; "getTextEdits"; old_path; new_path] ->
+    Commands.getTextEdits ~old_path ~new_path
   | args when List.mem "-h" args || List.mem "--help" args -> prerr_endline help
   | _ ->
     prerr_endline help;
     exit 1
-
 ;;
+
 main ()

@@ -125,6 +125,31 @@ export let formatUsingValidBscNativePath = (
   }
 };
 
+export let getTextEdits = (
+  filePath: p.DocumentUri,
+  oldContents: string,
+  newContents: string,
+  msg: RequestMessage
+) => {
+  let oldContentsTempFileFullPath = createFileInTempDir();
+  fs.writeFileSync(oldContentsTempFileFullPath, oldContents, {
+    encoding: "utf-8",
+  });
+  let newContentsTempFileFullPath = createFileInTempDir();
+  fs.writeFileSync(newContentsTempFileFullPath, newContents, {
+    encoding: "utf-8",
+  });
+  let response = runAnalysisCommand(
+    filePath,
+    ["getTextEdits", oldContentsTempFileFullPath, newContentsTempFileFullPath],
+    msg
+  );
+  // async unlink is fine. We don't use these file names again
+  fs.unlink(oldContentsTempFileFullPath, () => null);
+  fs.unlink(newContentsTempFileFullPath, () => null);
+  return response;
+};
+
 export let runAnalysisAfterSanityCheck = (
   filePath: p.DocumentUri,
   args: Array<any>

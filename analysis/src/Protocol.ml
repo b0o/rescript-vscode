@@ -95,6 +95,8 @@ let stringifyTextEdit te =
   }|}
     (stringifyRange te.range) (Json.escape te.newText)
 
+let stringifyTextEdits tes = tes |> List.map stringifyTextEdit |> array
+
 let stringifyoptionalVersionedTextDocumentIdentifier td =
   Printf.sprintf {|{
   "version": %s,

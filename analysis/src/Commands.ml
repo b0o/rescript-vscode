@@ -351,3 +351,13 @@ let test ~path =
           print_newline ())
     in
     lines |> List.iteri processLine
+
+let getTextEdits ~old_path ~new_path =
+  let old_contents =
+    match Files.readFile old_path with None -> assert false | Some s -> s
+  in
+  let new_contents =
+    match Files.readFile new_path with None -> assert false | Some s -> s
+  in
+  Diff.edit ~from:old_contents ~to_:new_contents
+  |> Protocol.stringifyTextEdits |> print_endline
